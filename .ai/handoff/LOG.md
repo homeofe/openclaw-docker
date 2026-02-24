@@ -5,8 +5,8 @@
 - Repo cloned from github.com/homeofe/openclaw-docker
 - AAHP handoff structure created
 - README.md written with architecture + agent tools + config schema
-- Context: Emre runs PRIVATE_PROJECT Docker stack (16 services) locally and wants to manage containers via natural language through OpenClaw
-- Key use case: "Is the PRIVATE_PROJECT stack healthy?", "Restart api-gateway", "Show me identity-service logs"
+- Context: User runs a multi-service Docker stack locally and wants to manage containers via natural language through OpenClaw.
+- Key use case: "Is the stack healthy?", "Restart a service", "Show me logs"
 
 ## 2026-02-23 — P1 to P4 MVP implementation
 
