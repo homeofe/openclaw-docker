@@ -2,7 +2,7 @@
   "id": "openclaw-docker",
   "name": "Docker",
   "description": "Manage Docker containers and Compose projects via OpenClaw tools",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "configSchema": {
     "type": "object",
     "additionalProperties": false,
