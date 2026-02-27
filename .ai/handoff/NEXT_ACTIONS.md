@@ -1,4 +1,4 @@
-# openclaw-docker — Next Actions
+# openclaw-docker - Next Actions
 
 ## Completed in this iteration
 

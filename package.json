@@ -1,7 +1,7 @@
 {
   "name": "@elvatis_com/openclaw-docker",
   "version": "0.1.2",
-  "description": "OpenClaw plugin — Docker container management: list, logs, start/stop, Compose stacks",
+  "description": "OpenClaw plugin - Docker container management: list, logs, start/stop, Compose stacks",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {

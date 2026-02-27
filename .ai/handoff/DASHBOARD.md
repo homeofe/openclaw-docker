@@ -1,4 +1,4 @@
-# openclaw-docker — Dashboard
+# openclaw-docker - Dashboard
 
 > Phase: P0 (initialized)
 

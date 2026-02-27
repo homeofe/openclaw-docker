@@ -1,4 +1,4 @@
-# openclaw-docker — Status
+# openclaw-docker - Status
 
 > Last updated: 2026-02-23
 > Phase: P1-P4 completed for MVP

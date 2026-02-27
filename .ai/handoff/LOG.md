@@ -1,6 +1,6 @@
-# openclaw-docker — Log
+# openclaw-docker - Log
 
-## 2026-02-22 — Project Initialized
+## 2026-02-22 - Project Initialized
 
 - Repo cloned from github.com/homeofe/openclaw-docker
 - AAHP handoff structure created
@@ -8,7 +8,7 @@
 - Context: User runs a multi-service Docker stack locally and wants to manage containers via natural language through OpenClaw.
 - Key use case: "Is the stack healthy?", "Restart a service", "Show me logs"
 
-## 2026-02-23 — P1 to P4 MVP implementation
+## 2026-02-23 - P1 to P4 MVP implementation
 
 - Implemented architecture in TypeScript strict mode:
   - `src/config.ts` for config normalization and TLS material loading
