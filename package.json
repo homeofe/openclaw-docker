@@ -26,6 +26,10 @@
   ],
   "author": "Elvatis <hello@example.invalid>",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/elvatis/openclaw-docker.git"
+  },
   "dependencies": {
     "dockerode": "^4.0.0"
   },
