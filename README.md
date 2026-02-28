@@ -125,6 +125,11 @@ npm run test:all         # both unit and integration tests
 
 The GitHub Actions workflow (`.github/workflows/ci.yml`) runs unit tests on every push and pull request to `main`, followed by integration tests against the real Docker daemon available on the CI runner.
 
+## Shared Template
+
+For automation that creates GitHub issues, use `src/templates/github-issue-helper.ts`.
+It provides `isValidIssueRepoSlug()`, `resolveIssueRepo()`, and `buildGhIssueCreateCommand()`.
+
 ## License
 
 MIT
