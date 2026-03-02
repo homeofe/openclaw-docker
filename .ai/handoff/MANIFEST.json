@@ -46,7 +46,7 @@
     "T-005": {
       "title": "Add docker_exec tool for running commands inside containers [high]",
       "status": "ready",
-      "priority": "medium",
+      "priority": "high",
       "depends_on": [],
       "created": "2026-03-02T03:59:08.681Z",
       "github_issue": 1,
@@ -73,7 +73,7 @@
     "T-008": {
       "title": "Add project-level CLAUDE.md with dev conventions [low]",
       "status": "ready",
-      "priority": "medium",
+      "priority": "low",
       "depends_on": [],
       "created": "2026-03-02T03:59:08.681Z",
       "github_issue": 4,
