@@ -1,7 +1,7 @@
 {
   "quick_context": "openclaw-docker v0.2.0 released. All tasks (T-001 through T-004) done. 9 tools available including docker_compose_ps. CI workflow with unit + integration tests. No open tasks.",
   "aahp_version": "3.0",
-  "next_task_id": 9,
+  "next_task_id": 10,
   "token_budget": {
     "manifest_only": 100,
     "full_read": 1200,
@@ -77,6 +77,16 @@
       "depends_on": [],
       "created": "2026-03-02T03:59:08.681Z",
       "github_issue": 4,
+      "github_repo": "elvatis/openclaw-docker"
+    },
+    "T-009": {
+      "title": "[CI] Failed run 22561945732 — tsc exit code 127 (tooling/environment missing)",
+      "status": "ready",
+      "priority": "high",
+      "depends_on": [],
+      "created": "2026-03-07T06:58:36.189Z",
+      "notes": "Automated CI triage created by Akido.\n\nRepository: elvatis/openclaw-docker\nFailed run: 22561945732\nRun URL: https://github.com/elvatis/openclaw-docker/actions/runs/22561945732\n\nSummary:\ntsc exit code 127 (tooling/environment missing)\n\nRelevant log excerpts:\n- See the Actions run for full logs: https://github.com/elvatis/openclaw-docker/actions/runs/22561945732\n\nSuggested next steps:\n- Reproduce locally: run the CI steps (install deps, tsc, lint, tests).\n- Apply the suggested fix from the automat",
+      "github_issue": 5,
       "github_repo": "elvatis/openclaw-docker"
     }
   },
