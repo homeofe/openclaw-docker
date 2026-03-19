@@ -35,6 +35,11 @@ export default function init(api: OpenClawApi): void {
   register("docker_restart", async (input) =>
     tools.docker_restart(input as { containerId: string; timeout?: number })
   );
+  register("docker_exec", async (input) =>
+    tools.docker_exec(
+      input as { containerId: string; command: string[]; workdir?: string; env?: string[] }
+    )
+  );
   register("docker_compose_up", async (input) =>
     tools.docker_compose_up(input as { project: string; detached?: boolean })
   );

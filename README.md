@@ -40,7 +40,7 @@ npm install @elvatis_com/openclaw-docker
     "openclaw-docker": {
       "socketPath": "/var/run/docker.sock",
       "readOnly": false,
-      "allowedOperations": ["ps", "logs", "inspect", "start", "stop", "restart", "compose_up", "compose_down", "compose_ps"],
+      "allowedOperations": ["ps", "logs", "inspect", "start", "stop", "restart", "exec", "compose_up", "compose_down", "compose_ps"],
       "composeProjects": [
         { "name": "aegis", "path": "/opt/aegis" }
       ],
@@ -79,6 +79,7 @@ npm install @elvatis_com/openclaw-docker
 - `docker_start`
 - `docker_stop`
 - `docker_restart`
+- `docker_exec`
 - `docker_compose_up`
 - `docker_compose_down`
 - `docker_compose_ps`
@@ -90,6 +91,8 @@ npm install @elvatis_com/openclaw-docker
 - "Follow api-gateway logs for 30 seconds"
 - "Inspect redis container"
 - "Restart identity-service"
+- "Run `ls -la /app` inside the api-gateway container"
+- "Exec into redis and run `redis-cli INFO server`"
 - "Bring aegis compose project up"
 - "Show status of aegis compose services"
 
@@ -103,6 +106,30 @@ The `docker_logs` tool supports real-time log streaming via `follow: true`. Logs
 | `tail` | number | 100 | Number of existing lines to include |
 | `follow` | boolean | false | Enable real-time log streaming |
 | `followDurationMs` | number | 10000 | How long to follow (ms), capped by `timeoutMs` |
+
+### docker_exec
+
+Run a command inside a running container and capture its output. Blocked by `readOnly: true`.
+
+| Parameter | Type | Required | Description |
+|---|---|---|---|
+| `containerId` | string | yes | Container name or ID |
+| `command` | string[] | yes | Command and arguments (e.g. `["ls", "-la", "/app"]`) |
+| `workdir` | string | no | Working directory inside the container |
+| `env` | string[] | no | Additional environment variables (`["KEY=value"]`) |
+
+Returns `{ ok, action, containerId, command, exitCode, stdout, stderr }`.
+
+**Example:**
+
+```json
+{
+  "containerId": "api-gateway",
+  "command": ["cat", "/etc/os-release"],
+  "workdir": "/app",
+  "env": ["DEBUG=1"]
+}
+```
 
 ## Safety and Permissions
 

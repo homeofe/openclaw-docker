@@ -118,6 +118,103 @@ describe("docker tools", () => {
 
     expect(result.Id).toBe("abc");
   });
+
+  test("docker_exec runs command and returns stdout/stderr", async () => {
+    const execStream = new PassThrough();
+    const mockExec = {
+      start: vi.fn().mockResolvedValue(execStream),
+      inspect: vi.fn().mockResolvedValue({ ExitCode: 0 })
+    };
+    const mockModem = {
+      demuxStream: vi.fn((stream: PassThrough, stdout: PassThrough, _stderr: PassThrough) => {
+        stream.on("data", (chunk: Buffer) => stdout.write(chunk));
+        stream.on("end", () => stdout.end());
+      })
+    };
+    const docker = {
+      getContainer: vi.fn().mockReturnValue({
+        exec: vi.fn().mockResolvedValue(mockExec)
+      }),
+      modem: mockModem
+    } as unknown as Parameters<typeof createTools>[0]["docker"];
+
+    const tools = createTools({ docker, config: baseConfig() });
+
+    setTimeout(() => {
+      execStream.write(Buffer.from("hello from exec\n"));
+      execStream.end();
+    }, 10);
+
+    const result = (await tools.docker_exec({
+      containerId: "abc",
+      command: ["echo", "hello from exec"]
+    })) as Record<string, unknown>;
+
+    expect(result.ok).toBe(true);
+    expect(result.action).toBe("exec");
+    expect(result.containerId).toBe("abc");
+    expect(result.exitCode).toBe(0);
+    expect(result.stdout).toContain("hello from exec");
+  });
+
+  test("docker_exec passes workdir and env options", async () => {
+    const execStream = new PassThrough();
+    const mockExec = {
+      start: vi.fn().mockResolvedValue(execStream),
+      inspect: vi.fn().mockResolvedValue({ ExitCode: 0 })
+    };
+    const containerObj = {
+      exec: vi.fn().mockResolvedValue(mockExec)
+    };
+    const docker = {
+      getContainer: vi.fn().mockReturnValue(containerObj),
+      modem: {
+        demuxStream: vi.fn((_stream: PassThrough, stdout: PassThrough, _stderr: PassThrough) => {
+          // Pipe the exec stream into stdout so end propagates
+          _stream.pipe(stdout);
+        })
+      }
+    } as unknown as Parameters<typeof createTools>[0]["docker"];
+
+    const tools = createTools({ docker, config: baseConfig() });
+
+    // End the stream after a tick so the promise listener is registered first
+    setTimeout(() => execStream.end(), 10);
+
+    await tools.docker_exec({
+      containerId: "abc",
+      command: ["ls", "-la"],
+      workdir: "/app",
+      env: ["FOO=bar"]
+    });
+
+    expect(containerObj.exec).toHaveBeenCalledWith(
+      expect.objectContaining({
+        Cmd: ["ls", "-la"],
+        WorkingDir: "/app",
+        Env: ["FOO=bar"]
+      })
+    );
+  });
+
+  test("docker_exec is blocked in readOnly mode", async () => {
+    const docker = {} as Parameters<typeof createTools>[0]["docker"];
+    const config: PluginConfig = { ...baseConfig(), readOnly: true };
+    const tools = createTools({ docker, config });
+
+    await expect(
+      tools.docker_exec({ containerId: "abc", command: ["ls"] })
+    ).rejects.toThrow(/readOnly/);
+  });
+
+  test("docker_exec throws when command is empty", async () => {
+    const docker = {} as Parameters<typeof createTools>[0]["docker"];
+    const tools = createTools({ docker, config: baseConfig() });
+
+    await expect(
+      tools.docker_exec({ containerId: "abc", command: [] })
+    ).rejects.toThrow(/non-empty/);
+  });
 });
 
 describe("docker_compose_ps", () => {

@@ -5,6 +5,7 @@ export type DockerOperation =
   | "start"
   | "stop"
   | "restart"
+  | "exec"
   | "compose_up"
   | "compose_down"
   | "compose_ps";

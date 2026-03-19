@@ -1,4 +1,4 @@
-import { Readable } from "node:stream";
+import { PassThrough, Readable } from "node:stream";
 import Docker from "dockerode";
 import { runComposeCommand } from "./compose";
 import { assertOperationAllowed } from "./guards";
@@ -22,6 +22,12 @@ interface ToolMap {
   docker_start: (input: { containerId: string }) => Promise<unknown>;
   docker_stop: (input: { containerId: string; timeout?: number }) => Promise<unknown>;
   docker_restart: (input: { containerId: string; timeout?: number }) => Promise<unknown>;
+  docker_exec: (input: {
+    containerId: string;
+    command: string[];
+    workdir?: string;
+    env?: string[];
+  }) => Promise<unknown>;
   docker_compose_up: (input: { project: string; detached?: boolean }) => Promise<unknown>;
   docker_compose_down: (input: { project: string; volumes?: boolean }) => Promise<unknown>;
   docker_compose_ps: (input: { project: string; services?: string[] }) => Promise<unknown>;
@@ -179,6 +185,73 @@ export function createTools({ docker, config, composeRunner = runComposeCommand 
         return { ok: true, action: "restart", containerId };
       } catch (error) {
         throw new Error(`Failed to restart '${containerId}': ${(error as Error).message}`);
+      }
+    },
+
+    async docker_exec(input) {
+      guard("exec", config);
+      const containerId = requiredContainer(input);
+
+      if (!Array.isArray(input.command) || input.command.length === 0) {
+        throw new Error("command must be a non-empty array of strings.");
+      }
+
+      try {
+        const container = docker.getContainer(containerId);
+
+        const execOptions: Docker.ExecCreateOptions = {
+          Cmd: input.command,
+          AttachStdout: true,
+          AttachStderr: true,
+          ...(input.workdir ? { WorkingDir: input.workdir } : {}),
+          ...(input.env && input.env.length > 0 ? { Env: input.env } : {})
+        };
+
+        const exec = await container.exec(execOptions);
+        const stream = await exec.start({ hijack: true, stdin: false });
+
+        return new Promise<unknown>((resolve, reject) => {
+          const stdoutStream = new PassThrough();
+          const stderrStream = new PassThrough();
+          const stdoutChunks: Buffer[] = [];
+          const stderrChunks: Buffer[] = [];
+
+          stdoutStream.on("data", (chunk: Buffer) => stdoutChunks.push(chunk));
+          stderrStream.on("data", (chunk: Buffer) => stderrChunks.push(chunk));
+
+          docker.modem.demuxStream(stream, stdoutStream, stderrStream);
+
+          stream.on("end", async () => {
+            try {
+              const inspectResult = await exec.inspect();
+              resolve({
+                ok: true,
+                action: "exec",
+                containerId,
+                command: input.command,
+                exitCode: inspectResult.ExitCode,
+                stdout: Buffer.concat(stdoutChunks).toString("utf8"),
+                stderr: Buffer.concat(stderrChunks).toString("utf8")
+              });
+            } catch (_inspectError) {
+              resolve({
+                ok: true,
+                action: "exec",
+                containerId,
+                command: input.command,
+                exitCode: null,
+                stdout: Buffer.concat(stdoutChunks).toString("utf8"),
+                stderr: Buffer.concat(stderrChunks).toString("utf8")
+              });
+            }
+          });
+
+          stream.on("error", (err: Error) => {
+            reject(new Error(`Failed to exec in '${containerId}': ${err.message}`));
+          });
+        });
+      } catch (error) {
+        throw new Error(`Failed to exec in '${containerId}': ${(error as Error).message}`);
       }
     },
 
